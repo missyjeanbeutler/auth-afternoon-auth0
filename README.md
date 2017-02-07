@@ -10,6 +10,7 @@ Use a Node backend with Passport and Express to show a user's coder friends.
 * [passport-github2] (https://github.com/cfsghost/passport-github)
 * [Github API Docs] (https://developer.github.com/v3/)
 * [node-github] (https://github.com/mikedeboer/node-github)
+* [passport-auth0] (https://www.npmjs.com/package/passport-auth0)
 
 ##Step 1: Create Skeleton of Angular App
 To mix it up, let's create the file structure for the Angular app first.
@@ -41,16 +42,18 @@ Create the server.js file and set it up to serve your static files.
   * express
   * express-session
   * passport
-  * passport-github2
-* [Create a Github app](https://github.com/settings/applications) and then set up the Github Strategy in your server.js with your associated `clientID` and `clientSecret`. Use a callbackURL that will redirect the user to `/auth/github/callback`
-* Make sure you use the session, passport.initialize and passport.session middelware
+  * passport-auth0
+* [Create an Auth0 app ("client")](https://manage.auth0.com/#/) and then set up the Auth0 Strategy in your server.js with your associated `clientID` and `clientSecret`. Check the boxes to ask for permission to access the Github accounts our user is following. 
+* Make sure you use the session, passport.initialize and passport.session middleware
 * Set up your auth endpoints:
 
 ####/auth/github
-Use passport.authenticate with Github
+Use passport.authenticate with 'auth0' as the first parameter, then {connection: 'github'} as the second parameter. This will choose GitHub as the authentication service. 
+
+Make sure to use 'auth/github/callback' as the callbackURL.
 
 ####/auth/github/callback
-Use passport.authenticate and upon successful auth, send the user to `/#/home`
+Use passport.authenticate and upon successful auth, send the user to `/#/home`. 
 
 ##Step 3: Github following Endpoint
 Let's link the Angular Github service to our server.js
@@ -61,7 +64,7 @@ In server.js, create the above endpoint and have it return the users that the cu
 ```
 https://api.github.com/user/followers
 ``` 
-Make sure that you authenticate the request with the logged in user's credentials. 
+Make sure that you authenticate the request with the 'User-Agent' header as listed on the request docs. The value for 'User-Agent' should be the clientID received through auth0. 
 
 - Or use the npm module [node-github](https://github.com/mikedeboer/node-github). The example on the page provides the needed information for your request.
 
