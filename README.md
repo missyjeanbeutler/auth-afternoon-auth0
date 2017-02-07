@@ -93,21 +93,20 @@ Now let's connect your Angular app to this setup.
 We need a way for Angular to detect an un-authed web request (403) so we can redirect them back to the login page. We can do that by injecting a service that acts as an interceptor in Angular's httpProvider. It works sort of like middleware in Node. Add this chunk of code to your `app.js` file.
 
 ```
-app.config(function($httpProvider) {
+  app.config(function($httpProvider) {
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.interceptors.push('myHttpInterceptor');
-});
+})
 
 // register the interceptor as a service
-app.factory('myHttpInterceptor', function($q) {
+  app.factory('myHttpInterceptor', function() {
     return {
-        // optional method
         'responseError': function(rejection) {
             if (rejection.status == 403) {
-                document.location = '/';
-                return;
+              document.location = '/';
+                return rejection;
             }
-            return $q.reject(rejection);
+            return rejection;
         }
     };
 });
